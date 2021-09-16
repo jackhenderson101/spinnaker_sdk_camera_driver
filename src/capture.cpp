@@ -50,6 +50,9 @@ void acquisition::Capture::onInit() {
     nh_pvt_ = this->getPrivateNodeHandle();
     //it_.reset(new image_transport::ImageTransport(nh_));
     it_ = std::shared_ptr<image_transport::ImageTransport>(new image_transport::ImageTransport(nh_));
+
+    updater.setHardwareID("none");
+    updater.broadcast(0, "Starting Camera node");
     // set values to global class variables and register pub, sub to ros
     init_variables_register_to_ros();
     init_array();
@@ -994,6 +997,9 @@ void acquisition::Capture::run_soft_trig() {
     ROS_INFO("*** ACQUISITION ***");
     
     start_acquisition();
+    double min_freq = 110.0;
+    double max_freq = 130.0;
+    diagnostic_updater::HeaderlessTopicDiagnostic image_pub_freq("camera framerate", updater, diagnostic_updater::FrequencyStatusParam(&min_freq, &max_freq, 0, 10));
 
     // Camera directories created at first save
     
@@ -1031,6 +1037,8 @@ void acquisition::Capture::run_soft_trig() {
     ros::Rate ros_rate(soft_framerate_);
     try{
         while( ros::ok() ) {
+            image_pub_freq.tick();
+            updater.update();
 
             double t = ros::Time::now().toSec();
 
