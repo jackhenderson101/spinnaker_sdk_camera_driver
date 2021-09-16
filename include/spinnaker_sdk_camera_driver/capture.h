@@ -23,6 +23,9 @@
 #include <nodelet/loader.h>
 #include "pluginlib/class_list_macros.h"
 
+#include "diagnostic_updater/diagnostic_updater.h"
+#include "diagnostic_updater/publisher.h"
+
 #ifdef trigger_msgs_FOUND
   #include <trigger_msgs/sync_trigger.h>
 #endif 
@@ -79,6 +82,8 @@ namespace acquisition {
         void dynamicReconfigureCallback(spinnaker_sdk_camera_driver::spinnaker_camConfig &config, uint32_t level);
        
         float mem_usage();
+
+        diagnostic_updater::Updater updater;
     
         SystemPtr system_;    
         CameraList camList_;
